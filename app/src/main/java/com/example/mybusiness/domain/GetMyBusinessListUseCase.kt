@@ -1,9 +1,9 @@
 package com.example.mybusiness.domain
 
-class GetMyBusinessListUseCase {
+class GetMyBusinessListUseCase(private val myBusinessRepository: MyBusinessRepository) {
 
     fun getBusinessList(): List<BusinessItem>{
-        TODO("Реализация логики данного use case")
+        return myBusinessRepository.getBusinessList()
     }
 
 }

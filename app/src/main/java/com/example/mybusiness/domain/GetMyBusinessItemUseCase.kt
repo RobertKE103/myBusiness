@@ -1,9 +1,9 @@
 package com.example.mybusiness.domain
 
-class GetMyBusinessItemUseCase {
+class GetMyBusinessItemUseCase(private val myBusinessRepository: MyBusinessRepository) {
 
-    fun searchItemMyBusiness(id: Int): BusinessItem {
-        TODO()
+    fun getItemMyBusiness(id: Int): BusinessItem {
+        return myBusinessRepository.getItemMyBusiness(id)
     }
 
 }

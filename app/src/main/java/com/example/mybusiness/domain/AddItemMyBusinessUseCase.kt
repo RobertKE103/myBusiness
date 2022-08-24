@@ -1,9 +1,9 @@
 package com.example.mybusiness.domain
 
-class AddItemMyBusinessUseCase {
+class AddItemMyBusinessUseCase(private val myBusinessRepository: MyBusinessRepository) {
 
     fun addItemMyBusiness(BusinessItem: BusinessItem){
-        TODO("Реализация логики данного use case")
+        myBusinessRepository.addItemMyBusiness(BusinessItem)
     }
 
 

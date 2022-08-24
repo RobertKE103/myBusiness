@@ -1,9 +1,9 @@
 package com.example.mybusiness.domain
 
-class EditItemMyBusinessUseCase {
+class EditItemMyBusinessUseCase(private val myBusinessRepository: MyBusinessRepository) {
 
-    fun EditItemMyBusiness(): BusinessItem{
-        TODO()
+    fun editItemMyBusiness(businessItem: BusinessItem){
+        myBusinessRepository.editItemMyBusiness(businessItem)
     }
 
 

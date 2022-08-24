@@ -1,9 +1,9 @@
 package com.example.mybusiness.domain
 
-class DeleteItemMyBusinessUseCase {
+class DeleteItemMyBusinessUseCase(private val myBusinessRepository: MyBusinessRepository) {
 
     fun deleteItemMyBusiness(BusinessItem: BusinessItem){
-        TODO()
+        myBusinessRepository.deleteItemMyBusiness(BusinessItem)
     }
 
 }
