@@ -6,7 +6,7 @@ interface MyBusinessRepository {
 
     fun deleteItemMyBusiness(BusinessItem: BusinessItem)
 
-    fun editItemMyBusiness(businessItem: BusinessItem): BusinessItem
+    fun editItemMyBusiness(businessItem: BusinessItem)
 
     fun getItemMyBusiness(id: Int): BusinessItem
 
