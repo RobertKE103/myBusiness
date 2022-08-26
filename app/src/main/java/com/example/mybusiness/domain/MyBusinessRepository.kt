@@ -1,5 +1,8 @@
 package com.example.mybusiness.domain
 
+import androidx.lifecycle.LiveData
+
+
 interface MyBusinessRepository {
 
     fun addItemMyBusiness(BusinessItem: BusinessItem)
@@ -10,6 +13,6 @@ interface MyBusinessRepository {
 
     fun getItemMyBusiness(id: Int): BusinessItem
 
-    fun getBusinessList(): List<BusinessItem>
+    fun getBusinessList(): LiveData<List<BusinessItem>>
 
 }
