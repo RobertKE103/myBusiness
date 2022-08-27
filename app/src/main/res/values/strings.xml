@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">my business</string>
+    <string name="add_new_business_item">Add new business item</string>
 </resources>

@@ -1,6 +1,5 @@
 package com.example.mybusiness.presentation
 
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.mybusiness.data.MyBusinessRepositoryImpl
 import com.example.mybusiness.domain.BusinessItem
