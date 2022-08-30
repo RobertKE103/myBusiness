@@ -16,6 +16,7 @@ class MainViewModel: ViewModel() {
 
     val businessList = getMyBusinessListUseCase.getBusinessList()
 
+
     fun deleteMyBusinessItem(businessItem: BusinessItem){
         deleteMyBusinessItemUseCase.deleteItemMyBusiness(businessItem)
     }
@@ -25,5 +26,10 @@ class MainViewModel: ViewModel() {
         editMyBusinessItemUseCase.editItemMyBusiness(newItem)
     }
 
+
+    fun changeEnabledState(businessItem: BusinessItem){
+        val newItem = businessItem.copy(enabled = !businessItem.enabled)
+        editMyBusinessItemUseCase.editItemMyBusiness(newItem)
+    }
 
 }

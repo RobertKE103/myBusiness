@@ -4,12 +4,21 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.mybusiness.domain.BusinessItem
 import com.example.mybusiness.domain.MyBusinessRepository
+import kotlin.random.Random
 
 object MyBusinessRepositoryImpl: MyBusinessRepository {
 
     private val myBusinessLD = MutableLiveData<List<BusinessItem>>()
-    private val businessList = mutableListOf<BusinessItem>()
+    private val businessList = sortedSetOf<BusinessItem>({o1, o2 -> o1.id.compareTo(o2.id)})
     private var autoIncrementId = 0
+
+
+    init {
+        for (i in 0..100){
+            val item = BusinessItem("name $i", i, Random.nextBoolean())
+            addItemMyBusiness(item)
+        }
+    }
 
 
     override fun addItemMyBusiness(BusinessItem: BusinessItem) {
