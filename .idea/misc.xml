@@ -3,6 +3,8 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/bikti/AndroidStudioProjects/mybusiness/app/src/main/res/layout/activity_add_business_item.xml" value="0.27291666666666664" />
+        <entry key="..\:/Users/bikti/AndroidStudioProjects/mybusiness/app/src/main/res/layout/activity_business_item.xml" value="0.27291666666666664" />
         <entry key="..\:/Users/bikti/AndroidStudioProjects/mybusiness/app/src/main/res/layout/activity_main.xml" value="0.27291666666666664" />
         <entry key="..\:/Users/bikti/AndroidStudioProjects/mybusiness/app/src/main/res/layout/item_business_disabled.xml" value="0.27291666666666664" />
         <entry key="..\:/Users/bikti/AndroidStudioProjects/mybusiness/app/src/main/res/layout/item_business_enabled.xml" value="0.271875" />

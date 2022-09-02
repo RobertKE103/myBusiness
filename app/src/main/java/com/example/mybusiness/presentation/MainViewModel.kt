@@ -22,7 +22,7 @@ class MainViewModel: ViewModel() {
     }
 
     fun editMyBusinessItem(businessItem: BusinessItem){
-        val newItem = businessItem.copy(enabled = !businessItem.enabled)
+        val newItem = businessItem.copy()
         editMyBusinessItemUseCase.editItemMyBusiness(newItem)
     }
 
