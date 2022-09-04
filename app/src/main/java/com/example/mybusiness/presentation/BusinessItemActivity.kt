@@ -2,26 +2,14 @@ package com.example.mybusiness.presentation
 
 import android.content.Context
 import android.content.Intent
+import android.content.Intent.parseIntent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.widget.Button
-import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.widget.addTextChangedListener
-import androidx.lifecycle.ViewModelProvider
 import com.example.mybusiness.R
-import com.google.android.material.textfield.TextInputLayout
 
 class BusinessItemActivity : AppCompatActivity() {
-
-    private lateinit var viewModel: BusinessItemViewModel
-
-    private lateinit var tilName: TextInputLayout
-    private lateinit var tilCount: TextInputLayout
-    private lateinit var etName: EditText
-    private lateinit var etCount: EditText
-    private lateinit var buttonAddBusinessItem: Button
 
     private var screenMode = ""
     private var businessItemId = -1
@@ -30,86 +18,20 @@ class BusinessItemActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_business_item)
         parseIntent()
-        viewModel = ViewModelProvider(this)[BusinessItemViewModel::class.java]
-        initViews()
-
-        etName.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-
-            }
-
-            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                viewModel.resetErrorInputName()
-            }
-
-            override fun afterTextChanged(p0: Editable?) {
-
-            }
-
-        })
-        etCount.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-
-            }
-
-            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                viewModel.resetErrorInputCount()
-            }
-
-            override fun afterTextChanged(p0: Editable?) {
-
-            }
-
-        })
-        etCount.addTextChangedListener {
-            tilCount.error = null
-        }
-
-        when (screenMode) {
-            MODE_EDIT -> launchEditMode()
-            MODE_ADD -> launchAddMode()
-        }
-
-        viewModel.errorInputCount.observe(this) {
-            val message = if (it) {
-                "Invalid count"
-            } else {
-                null
-            }
-            tilCount.error = message
-        }
-        viewModel.errorInputName.observe(this) {
-            val message = if (it) {
-                "Invalid name"
-            } else {
-                null
-            }
-            tilCount.error = message
-        }
-
-        viewModel.shouldCloseScreen.observe(this){
-            finish()
-        }
+        if (savedInstanceState == null)
+            launchRightMode()
     }
 
-    private fun launchEditMode() {
-        viewModel.getBusinessItem(businessItemId)
-        viewModel.businessItem.observe(this) {
-            etName.setText(it.name)
-            etCount.setText(it.count.toString())
+    private fun launchRightMode() {
+        val fragment = when (screenMode) {
+            MODE_EDIT -> BusinessItemFragment.newInstanceEditItem(businessItemId)
+            MODE_ADD -> BusinessItemFragment.newInstanceAddItem()
+            else -> throw RuntimeException("error")
         }
-        buttonAddBusinessItem.setOnClickListener {
-            viewModel.editBusinessItem(etName.text?.toString(), etCount.text?.toString())
-        }
-
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.business_item_container, fragment)
+            .commit()
     }
-
-    private fun launchAddMode() {
-        buttonAddBusinessItem.setOnClickListener {
-            viewModel.addBusinessItem(etName.text?.toString(), etCount.text?.toString())
-        }
-    }
-
 
     private fun parseIntent() {
         if (!intent.hasExtra(EXTRA_SCREEN_MODE)) {
@@ -130,15 +52,6 @@ class BusinessItemActivity : AppCompatActivity() {
             businessItemId = intent.getIntExtra(EXTRA_BUSINESS_ITEM_ID, -1)
         }
 
-
-    }
-
-    private fun initViews() {
-        tilName = findViewById(R.id.addNameBusinessItem)
-        etName = findViewById(R.id.addNameBusinessItemEdit)
-        tilCount = findViewById(R.id.addCountBusinessItem)
-        etCount = findViewById(R.id.addCountBusinessItemEdit)
-        buttonAddBusinessItem = findViewById(R.id.saveBusinessItem)
 
     }
 
@@ -164,3 +77,6 @@ class BusinessItemActivity : AppCompatActivity() {
         }
     }
 }
+
+
+

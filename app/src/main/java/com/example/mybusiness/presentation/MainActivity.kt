@@ -2,6 +2,9 @@ package com.example.mybusiness.presentation
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentContainer
+import androidx.fragment.app.FragmentContainerView
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
@@ -12,10 +15,12 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var viewModel: MainViewModel
     private lateinit var adapter: BusinessListAdapter
+    private var businessItemContainer: FragmentContainerView?= null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        businessItemContainer = findViewById(R.id.fragment_container_from_main)
         setupRv()
         viewModel = ViewModelProvider(this)[MainViewModel::class.java]
         viewModel.businessList.observe(this) {
@@ -24,9 +29,25 @@ class MainActivity : AppCompatActivity() {
 
         val buttonAddItem = findViewById<FloatingActionButton>(R.id.button_add_business_item)
         buttonAddItem.setOnClickListener {
-            val intent = BusinessItemActivity.newIntentAddItem(this)
-            startActivity(intent)
+            if (isOnePaneMode()) {
+                val intent = BusinessItemActivity.newIntentAddItem(this)
+                startActivity(intent)
+            } else {
+                launchFragment(BusinessItemFragment.newInstanceAddItem())
+            }
         }
+    }
+
+    private fun launchFragment(fragment: Fragment){
+        supportFragmentManager.popBackStackImmediate()
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container_from_main, fragment)
+            .addToBackStack(null)
+            .commit()
+    }
+
+    private fun isOnePaneMode(): Boolean{
+        return businessItemContainer == null
     }
 
     private fun setupRv() {
@@ -52,7 +73,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                val item = adapter.businessList[viewHolder.adapterPosition]
+                val item = adapter.businessList[viewHolder.bindingAdapterPosition]
                 viewModel.deleteMyBusinessItem(item)
             }
         }
@@ -63,9 +84,12 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupClickListener() {
         adapter.onBusinessItemClickListener = {
-//            Toast.makeText(this, it.toString(), Toast.LENGTH_SHORT).show()
-            val intent = BusinessItemActivity.newIntentEditItem(this, it.id )
-            startActivity(intent)
+            if (isOnePaneMode()) {
+                val intent = BusinessItemActivity.newIntentEditItem(this, it.id)
+                startActivity(intent)
+            } else {
+                launchFragment(BusinessItemFragment.newInstanceEditItem(it.id))
+            }
         }
     }
 
