@@ -6,33 +6,28 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import com.example.mybusiness.R
-import com.google.android.material.textfield.TextInputLayout
+import com.example.mybusiness.databinding.FragmentBusinessItemBinding
 
 
 class BusinessItemFragment(
     private val screenMode: String = "",
-    private val businessItemId: Int = -1
+    private val businessItemId: Int = 0
 ) : Fragment() {
 
+    private var _binding: FragmentBusinessItemBinding? = null
+    private val binding get() = _binding!!
+
     private lateinit var viewModel: BusinessItemViewModel
-    private lateinit var tilName: TextInputLayout
-    private lateinit var tilCount: TextInputLayout
-    private lateinit var etName: EditText
-    private lateinit var etCount: EditText
-    private lateinit var buttonAddBusinessItem: Button
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_business_item, container, false)
+    ): View {
+        _binding = FragmentBusinessItemBinding.inflate(layoutInflater, container, false)
+        return binding.root
     }
 
 
@@ -40,9 +35,8 @@ class BusinessItemFragment(
         super.onViewCreated(view, savedInstanceState)
         parseParams()
         viewModel = ViewModelProvider(this)[BusinessItemViewModel::class.java]
-        initViews(view)
 
-        etName.addTextChangedListener(object : TextWatcher {
+        binding.addNameBusinessItemEdit.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
             }
 
@@ -54,9 +48,8 @@ class BusinessItemFragment(
             }
 
         })
-        etCount.addTextChangedListener(object : TextWatcher {
+        binding.addCountBusinessItemEdit.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-
             }
 
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
@@ -64,12 +57,11 @@ class BusinessItemFragment(
             }
 
             override fun afterTextChanged(p0: Editable?) {
-
             }
 
         })
-        etCount.addTextChangedListener {
-            tilCount.error = null
+        binding.addCountBusinessItemEdit.addTextChangedListener {
+            binding.addCountBusinessItem.error = null
         }
 
         when (screenMode) {
@@ -83,7 +75,7 @@ class BusinessItemFragment(
             } else {
                 null
             }
-            tilCount.error = message
+            binding.addCountBusinessItem.error = message
         }
         viewModel.errorInputName.observe(viewLifecycleOwner) {
             val message = if (it) {
@@ -91,7 +83,7 @@ class BusinessItemFragment(
             } else {
                 null
             }
-            tilName.error = message
+            binding.addNameBusinessItem.error = message
         }
 
         viewModel.shouldCloseScreen.observe(viewLifecycleOwner) {
@@ -102,18 +94,20 @@ class BusinessItemFragment(
     private fun launchEditMode() {
         viewModel.getBusinessItem(businessItemId)
         viewModel.businessItem.observe(viewLifecycleOwner) {
-            etName.setText(it.name)
-            etCount.setText(it.count.toString())
+            binding.addNameBusinessItemEdit.setText(it.name)
+            binding.addCountBusinessItemEdit.setText(it.count.toString())
         }
-        buttonAddBusinessItem.setOnClickListener {
-            viewModel.editBusinessItem(etName.text?.toString(), etCount.text?.toString())
+        binding.saveBusinessItem.setOnClickListener {
+            viewModel.editBusinessItem(binding.addNameBusinessItemEdit.text?.toString(),
+                binding.addCountBusinessItemEdit.text?.toString())
         }
 
     }
 
     private fun launchAddMode() {
-        buttonAddBusinessItem.setOnClickListener {
-            viewModel.addBusinessItem(etName.text?.toString(), etCount.text?.toString())
+        binding.saveBusinessItem.setOnClickListener {
+            viewModel.addBusinessItem(binding.addNameBusinessItemEdit.text?.toString(),
+                binding.addCountBusinessItemEdit.text?.toString())
         }
     }
 
@@ -128,18 +122,6 @@ class BusinessItemFragment(
 
 
     }
-
-    private fun initViews(view: View) {
-        with(view) {
-            tilName = findViewById(R.id.addNameBusinessItem)
-            etName = findViewById(R.id.addNameBusinessItemEdit)
-            tilCount = findViewById(R.id.addCountBusinessItem)
-            etCount = findViewById(R.id.addCountBusinessItemEdit)
-            buttonAddBusinessItem = findViewById(R.id.saveBusinessItem)
-        }
-
-    }
-
 
     companion object {
 

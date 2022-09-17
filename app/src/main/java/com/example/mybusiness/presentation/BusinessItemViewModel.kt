@@ -1,15 +1,19 @@
 package com.example.mybusiness.presentation
 
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.mybusiness.data.MyBusinessRepositoryImpl
 import com.example.mybusiness.domain.AddItemMyBusinessUseCase
 import com.example.mybusiness.domain.BusinessItem
 import com.example.mybusiness.domain.EditItemMyBusinessUseCase
 import com.example.mybusiness.domain.GetMyBusinessItemUseCase
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 
-class BusinessItemViewModel : ViewModel() {
+class BusinessItemViewModel(application: Application) : AndroidViewModel(application) {
 
     private val _errorInputName = MutableLiveData<Boolean>()
     val errorInputName: LiveData<Boolean> get() = _errorInputName
@@ -23,40 +27,47 @@ class BusinessItemViewModel : ViewModel() {
     private val _shouldCloseScreen = MutableLiveData<Unit>()
     val shouldCloseScreen: LiveData<Unit> get() = _shouldCloseScreen
 
-    private val repository = MyBusinessRepositoryImpl
+    private val repository = MyBusinessRepositoryImpl(application)
     private val getMyBusinessItemUseCase = GetMyBusinessItemUseCase(repository)
     private val editItemMyBusinessUseCase = EditItemMyBusinessUseCase(repository)
     private val addItemMyBusinessUseCase = AddItemMyBusinessUseCase(repository)
 
     fun getBusinessItem(businessItemId: Int) {
-        val item = getMyBusinessItemUseCase.getItemMyBusiness(businessItemId)
-        _businessItem.value = item
+        viewModelScope.launch {
+            val item = getMyBusinessItemUseCase.getItemMyBusiness(businessItemId)
+            _businessItem.postValue(item)
+        }
     }
 
     fun addBusinessItem(name: String?, count: String?) {
-        val inputName = parseName(name)
-        val countB = parseCount(count)
-        val fieldsValid = validateInput(inputName, countB)
-        if (fieldsValid) {
-            val businessItem = BusinessItem(inputName, countB, true)
-            addItemMyBusinessUseCase.addItemMyBusiness(businessItem)
-            closeScreen()
+        viewModelScope.launch {
+            val inputName = parseName(name)
+            val countB = parseCount(count)
+            val fieldsValid = validateInput(inputName, countB)
+            if (fieldsValid) {
+                val businessItem = BusinessItem(inputName, countB, true)
+                addItemMyBusinessUseCase.addItemMyBusiness(businessItem)
+                closeScreen()
+            }
         }
+
 
     }
 
     fun editBusinessItem(name: String?, count: String?) {
-        val inputName = parseName(name)
-        val countB = parseCount(count)
-        val fieldsValid = validateInput(inputName, countB)
-        if (fieldsValid) {
-            _businessItem.value?.let {
-                val item = it.copy(name = inputName, count = countB)
-                editItemMyBusinessUseCase.editItemMyBusiness(item)
-                closeScreen()
+        viewModelScope.launch {
+            val inputName = parseName(name)
+            val countB = parseCount(count)
+            val fieldsValid = validateInput(inputName, countB)
+            if (fieldsValid) {
+                _businessItem.value?.let {
+                    val item = it.copy(name = inputName, count = countB)
+                    editItemMyBusinessUseCase.editItemMyBusiness(item)
+                    closeScreen()
+                }
             }
-
         }
+
     }
 
 
@@ -94,8 +105,13 @@ class BusinessItemViewModel : ViewModel() {
     }
 
     private fun closeScreen() {
-        _shouldCloseScreen.value = Unit
+        _shouldCloseScreen.postValue(Unit)
     }
 
+
+    override fun onCleared() {
+        super.onCleared()
+        viewModelScope.cancel()
+    }
 
 }

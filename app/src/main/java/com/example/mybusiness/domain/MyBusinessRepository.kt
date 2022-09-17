@@ -5,13 +5,13 @@ import androidx.lifecycle.LiveData
 
 interface MyBusinessRepository {
 
-    fun addItemMyBusiness(BusinessItem: BusinessItem)
+    suspend fun addItemMyBusiness(BusinessItem: BusinessItem)
 
-    fun deleteItemMyBusiness(BusinessItem: BusinessItem)
+    suspend fun deleteItemMyBusiness(BusinessItem: BusinessItem)
 
-    fun editItemMyBusiness(businessItem: BusinessItem)
+    suspend fun editItemMyBusiness(businessItem: BusinessItem)
 
-    fun getItemMyBusiness(id: Int): BusinessItem
+    suspend fun getItemMyBusiness(id: Int): BusinessItem
 
     fun getBusinessList(): LiveData<List<BusinessItem>>
 

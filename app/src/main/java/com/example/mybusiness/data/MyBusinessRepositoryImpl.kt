@@ -1,58 +1,42 @@
 package com.example.mybusiness.data
 
+import android.app.Application
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.MediatorLiveData
+import com.example.mybusiness.data.room.AppDatabase
 import com.example.mybusiness.domain.BusinessItem
 import com.example.mybusiness.domain.MyBusinessRepository
-import kotlin.random.Random
 
-object MyBusinessRepositoryImpl: MyBusinessRepository {
+class MyBusinessRepositoryImpl(
+    application: Application
+) : MyBusinessRepository {
 
-    private val myBusinessLD = MutableLiveData<List<BusinessItem>>()
-    private val businessList = sortedSetOf<BusinessItem>({o1, o2 -> o1.id.compareTo(o2.id)})
-    private var autoIncrementId = 0
+    private var businessListDao = AppDatabase.getInstance(application).businessListDao()
+    private val mapper = BusinessListMapper()
 
+    override suspend fun addItemMyBusiness(BusinessItem: BusinessItem) {
+        businessListDao.addBusinessItem(mapper.mapEntityToDbModel(BusinessItem))
+    }
 
-    init {
-        for (i in 0..100){
-            val item = BusinessItem("name $i", i, Random.nextBoolean())
-            addItemMyBusiness(item)
+    override suspend fun deleteItemMyBusiness(BusinessItem: BusinessItem) {
+        businessListDao.deleteBusinessItem(BusinessItem.id)
+    }
+
+    override suspend fun editItemMyBusiness(businessItem: BusinessItem) {
+        businessListDao.addBusinessItem(mapper.mapEntityToDbModel(businessItem))
+    }
+
+    override suspend fun getItemMyBusiness(id: Int): BusinessItem {
+        val dbModel = businessListDao.getBusinessItem(id)
+        return mapper.mapDbModelToEntity(dbModel)
+    }
+
+    override fun getBusinessList(): LiveData<List<BusinessItem>> =
+        MediatorLiveData<List<BusinessItem>>().apply {
+            addSource(businessListDao.getBusinessList()) {
+                value = mapper.mapListDbModelToListEntity(it)
+            }
         }
-    }
-
-
-    override fun addItemMyBusiness(BusinessItem: BusinessItem) {
-        if (BusinessItem.id == com.example.mybusiness.domain.BusinessItem.ID_USER)
-            BusinessItem.id = autoIncrementId++
-        businessList.add(BusinessItem)
-        updateList()
-
-    }
-
-    override fun deleteItemMyBusiness(BusinessItem: BusinessItem) {
-        businessList.remove(BusinessItem)
-        updateList()
-    }
-
-    override fun editItemMyBusiness(businessItem: BusinessItem) {
-        val oldElement = getItemMyBusiness(businessItem.id)
-        businessList.remove(oldElement)
-        addItemMyBusiness(businessItem)
-    }
-
-    override fun getItemMyBusiness(id: Int): BusinessItem {
-        return businessList.find {
-            it.id == id
-        } ?: throw RuntimeException("Null")
-    }
-
-    override fun getBusinessList(): LiveData<List<BusinessItem>> {
-        return myBusinessLD
-    }
-
-    private fun updateList(){
-        myBusinessLD.value = businessList.toList()
-    }
 
 
 }

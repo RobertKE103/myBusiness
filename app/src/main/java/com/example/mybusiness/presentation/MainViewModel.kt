@@ -1,15 +1,21 @@
 package com.example.mybusiness.presentation
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.mybusiness.data.MyBusinessRepositoryImpl
 import com.example.mybusiness.domain.BusinessItem
 import com.example.mybusiness.domain.DeleteItemMyBusinessUseCase
 import com.example.mybusiness.domain.EditItemMyBusinessUseCase
 import com.example.mybusiness.domain.GetMyBusinessListUseCase
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 
-class MainViewModel: ViewModel() {
+class MainViewModel(application: Application): AndroidViewModel(application) {
 
-    private var repository = MyBusinessRepositoryImpl
+    private var repository = MyBusinessRepositoryImpl(application)
     private val getMyBusinessListUseCase = GetMyBusinessListUseCase(repository)
     private val deleteMyBusinessItemUseCase = DeleteItemMyBusinessUseCase(repository)
     private val editMyBusinessItemUseCase = EditItemMyBusinessUseCase(repository)
@@ -18,18 +24,17 @@ class MainViewModel: ViewModel() {
 
 
     fun deleteMyBusinessItem(businessItem: BusinessItem){
-        deleteMyBusinessItemUseCase.deleteItemMyBusiness(businessItem)
+        viewModelScope.launch {
+            deleteMyBusinessItemUseCase.deleteItemMyBusiness(businessItem)
+        }
     }
-
-    fun editMyBusinessItem(businessItem: BusinessItem){
-        val newItem = businessItem.copy()
-        editMyBusinessItemUseCase.editItemMyBusiness(newItem)
-    }
-
 
     fun changeEnabledState(businessItem: BusinessItem){
         val newItem = businessItem.copy(enabled = !businessItem.enabled)
-        editMyBusinessItemUseCase.editItemMyBusiness(newItem)
-    }
+        viewModelScope.launch {
+            editMyBusinessItemUseCase.editItemMyBusiness(newItem)
 
+        }
+
+    }
 }

@@ -2,10 +2,7 @@ package com.example.mybusiness.presentation
 
 import android.content.Context
 import android.content.Intent
-import android.content.Intent.parseIntent
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import androidx.appcompat.app.AppCompatActivity
 import com.example.mybusiness.R
 
@@ -49,7 +46,7 @@ class BusinessItemActivity : AppCompatActivity() {
             if (!intent.hasExtra(EXTRA_BUSINESS_ITEM_ID)) {
                 throw RuntimeException("error")
             }
-            businessItemId = intent.getIntExtra(EXTRA_BUSINESS_ITEM_ID, -1)
+            businessItemId = intent.getIntExtra(EXTRA_BUSINESS_ITEM_ID, 0)
         }
 
 
