@@ -67,7 +67,6 @@ class BusinessItemViewModel(application: Application) : AndroidViewModel(applica
                 }
             }
         }
-
     }
 
 
